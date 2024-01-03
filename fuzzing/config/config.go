@@ -98,6 +98,10 @@ type TestingConfig struct {
 	// assertion, optimization, custom) are found.
 	StopOnNoTests bool `json:"stopOnNoTests"`
 
+	// CallAllContracts indicates whether all contracts should be called (including dynamically deployed ones), rather
+	// than just the contracts specified in the project configuration's deployment order.
+	CallAllContracts bool `json:"callAllContracts"`
+
 	// TestAllContracts indicates whether all contracts should be tested (including dynamically deployed ones), rather
 	// than just the contracts specified in the project configuration's deployment order.
 	TestAllContracts bool `json:"testAllContracts"`
