@@ -3,11 +3,13 @@ package chain
 import (
 	"errors"
 	"fmt"
-	"github.com/crytic/medusa/chain/config"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"golang.org/x/exp/maps"
 	"math/big"
 	"sort"
+
+	"github.com/crytic/medusa/chain/config"
+	"github.com/crytic/medusa/compilation/abiutils"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"golang.org/x/exp/maps"
 
 	chainTypes "github.com/crytic/medusa/chain/types"
 	"github.com/crytic/medusa/chain/vendored"
@@ -727,6 +729,12 @@ func (t *TestChain) PendingBlockAddTx(message *core.Message) error {
 
 	// For every tracer we have, we call upon them to set their results for this transaction now.
 	t.transactionTracerRouter.CaptureTxEndSetAdditionalResults(messageResult)
+
+	// Check if an error was set by a cheatcode, if so break the fuzzing process
+	panicCode := abiutils.GetSolidityPanicCode(messageResult.ExecutionResult.Err, messageResult.ExecutionResult.ReturnData, true)
+	if panicCode != nil && panicCode.Cmp(big.NewInt(abiutils.PanicCodeAssertFailed)) == 0 {
+		return fmt.Errorf("an unexpected error occurred")
+	}
 
 	// Write state changes to database.
 	// NOTE: If this completes without an error, we know we didn't hit the block gas limit or other errors, so we are
