@@ -2,15 +2,16 @@ package fuzzing
 
 import (
 	"encoding/hex"
+	"math/big"
+	"math/rand"
+	"testing"
+
 	"github.com/crytic/medusa/chain"
 	"github.com/crytic/medusa/events"
 	"github.com/crytic/medusa/fuzzing/calls"
 	"github.com/crytic/medusa/fuzzing/valuegeneration"
 	"github.com/crytic/medusa/utils"
 	"github.com/ethereum/go-ethereum/common"
-	"math/big"
-	"math/rand"
-	"testing"
 
 	"github.com/crytic/medusa/fuzzing/config"
 	"github.com/stretchr/testify/assert"
@@ -212,6 +213,7 @@ func TestCheatCodes(t *testing.T) {
 		"testdata/contracts/cheat_codes/vm/coinbase.sol",
 		"testdata/contracts/cheat_codes/vm/chain_id.sol",
 		"testdata/contracts/cheat_codes/vm/deal.sol",
+		"testdata/contracts/cheat_codes/vm/expect_revert.sol",
 		"testdata/contracts/cheat_codes/vm/difficulty.sol",
 		"testdata/contracts/cheat_codes/vm/etch.sol",
 		"testdata/contracts/cheat_codes/vm/fee.sol",
