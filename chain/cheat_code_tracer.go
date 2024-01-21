@@ -180,6 +180,8 @@ func (t *cheatCodeTracer) CaptureExit(output []byte, gasUsed uint64, err error) 
 	}
 	// Execute all current call frame exit hooks
 	exitingCallFrame := t.callFrames[t.callDepth]
+	exitingCallFrame.vmReturnData = output
+	exitingCallFrame.vmErr = err
 	exitingCallFrame.onFrameExitRestoreHooks.Execute(false, true)
 	parentCallFrame := t.callFrames[t.callDepth-1]
 
