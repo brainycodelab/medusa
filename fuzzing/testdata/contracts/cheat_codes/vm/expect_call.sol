@@ -79,7 +79,7 @@ contract TestContract {
 
         // Expect a call to bank.deposit with specific value and calldata
         cheats.expectCall(address(bank), 3, abi.encodeCall(bank.deposit, (3)));
-        // This increases the contract balance so the transfer will be successful
+        // Increase the contract balance to ensure a successful transaction
         cheats.deal(address(this), 300);
         bank.deposit{value: 3}(3);
 
@@ -90,15 +90,18 @@ contract TestContract {
             abi.encodeCall(bank.deposit, (3)),
             5
         );
-        cheats.deal(address(this), 4);
-        bank.deposit{value: 3}(3);
-        cheats.deal(address(this), 4);
-        bank.deposit{value: 3}(3);
-        cheats.deal(address(this), 4);
-        bank.deposit{value: 3}(3);
-        cheats.deal(address(this), 4);
-        bank.deposit{value: 3}(3);
-        cheats.deal(address(this), 4);
-        bank.deposit{value: 3}(3);
+
+        uint256 amountToDeposit = 3;
+
+        cheats.deal(address(this), amountToDeposit);
+        bank.deposit{value: amountToDeposit}(amountToDeposit);
+        cheats.deal(address(this), amountToDeposit);
+        bank.deposit{value: amountToDeposit}(amountToDeposit);
+        cheats.deal(address(this), amountToDeposit);
+        bank.deposit{value: amountToDeposit}(amountToDeposit);
+        cheats.deal(address(this), amountToDeposit);
+        bank.deposit{value: amountToDeposit}(amountToDeposit);
+        cheats.deal(address(this), amountToDeposit);
+        bank.deposit{value: amountToDeposit}(amountToDeposit);
     }
 }
