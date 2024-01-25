@@ -197,9 +197,6 @@ func (t *cheatCodeTracer) CaptureExit(output []byte, gasUsed uint64, err error) 
 	// We're exiting the current frame, so remove our frame data.
 	t.callFrames = t.callFrames[:t.callDepth]
 
-	exitingCallFrame.vmReturnData = output
-	exitingCallFrame.vmErr = err
-
 	// Decrease our call depth now that we've exited a call frame.
 	t.callDepth--
 }
