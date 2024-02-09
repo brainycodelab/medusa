@@ -424,7 +424,7 @@ func chainSetupFromCompilations(fuzzer *Fuzzer, testChain *chain.TestChain) erro
 
 					// Ensure our transaction succeeded
 					if block.MessageResults[0].Receipt.Status != types.ReceiptStatusSuccessful {
-						return fmt.Errorf("tx to increase contract balance returned a failed status: %v", block.MessageResults[0].ExecutionResult.Err)
+						return fmt.Errorf("tx to increase contract balance returned a failed status: %v. Do you have a receive function in your contract? ", block.MessageResults[0].ExecutionResult.Err)
 					}
 				}
 
