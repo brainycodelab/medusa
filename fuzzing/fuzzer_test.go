@@ -426,6 +426,53 @@ func TestDeploymentsSelfDestruct(t *testing.T) {
 	}
 }
 
+// TestDeployedContractStartingBalance runs tests to ensure deployed contracts can be given a starting balancey.
+func TestDeployedContractStartingBalance(t *testing.T) {
+	// These contracts provide functions to deploy inner contracts which have properties that will produce a failure.
+	filePaths := []string{
+		"testdata/contracts/deployments/starting_balance.sol",
+	}
+	for _, filePath := range filePaths {
+		runFuzzerTest(t, &fuzzerSolcFileTest{
+			filePath: filePath,
+			configUpdates: func(config *config.ProjectConfig) {
+				config.Fuzzing.DeploymentOrder = []string{"DeployedContractStartingBalance"}
+				config.Fuzzing.Testing.AssertionTesting.Enabled = true
+				config.Fuzzing.ContractStartingBalance = 3_000
+				config.Fuzzing.TestLimit = 1_000
+				config.Fuzzing.Testing.StopOnFailedContractMatching = true
+			},
+			method: func(f *fuzzerTestContext) {
+				// Start the fuzzer
+				err := f.fuzzer.Start()
+				assert.NoError(t, err)
+
+				// Check for any failed tests
+				assertFailedTestsExpected(f, false)
+			},
+		})
+	}
+
+	// This contract deploys an inner contract upon construction, which contains properties that will produce a failure.
+	runFuzzerTest(t, &fuzzerSolcFileTest{
+		filePath: "testdata/contracts/deployments/inner_deployment_on_construction.sol",
+		configUpdates: func(config *config.ProjectConfig) {
+			config.Fuzzing.DeploymentOrder = []string{"InnerDeploymentFactory"}
+			config.Fuzzing.TestLimit = 1_000 // this test should expose a failure quickly.
+			config.Fuzzing.Testing.StopOnFailedContractMatching = true
+			config.Fuzzing.Testing.TestAllContracts = true // test dynamically deployed contracts
+		},
+		method: func(f *fuzzerTestContext) {
+			// Start the fuzzer
+			err := f.fuzzer.Start()
+			assert.NoError(t, err)
+
+			// Check to see if there are any failures
+			assertFailedTestsExpected(f, true)
+		},
+	})
+}
+
 // TestExecutionTraces runs tests to ensure that execution traces capture information
 // regarding assertion failures, revert reasons, etc.
 func TestExecutionTraces(t *testing.T) {
