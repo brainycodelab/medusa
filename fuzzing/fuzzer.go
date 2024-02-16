@@ -400,6 +400,10 @@ func chainSetupFromCompilations(fuzzer *Fuzzer, testChain *chain.TestChain) erro
 				contractAddress := block.MessageResults[0].Receipt.ContractAddress
 
 				if fuzzer.config.Fuzzing.ContractStartingBalance > 0 {
+					if !contract.CompiledContract().Abi.HasReceive() {
+						return fmt.Errorf("contract %s does not have a receive method", contractName)
+					}
+
 					// Create a new call message to give the contract starting balance
 					msg = calls.NewCallMessage(fuzzer.deployer, &contractAddress, 0, big.NewInt(int64(fuzzer.config.Fuzzing.ContractStartingBalance)), fuzzer.config.Fuzzing.BlockGasLimit, nil, nil, nil, nil)
 					msg.FillFromTestChainProperties(testChain)
@@ -424,7 +428,7 @@ func chainSetupFromCompilations(fuzzer *Fuzzer, testChain *chain.TestChain) erro
 
 					// Ensure our transaction succeeded
 					if block.MessageResults[0].Receipt.Status != types.ReceiptStatusSuccessful {
-						return fmt.Errorf("tx to increase contract balance returned a failed status: %v. Do you have a receive function in your contract? ", block.MessageResults[0].ExecutionResult.Err)
+						return fmt.Errorf("tx to increase contract balance returned a failed status: %v", block.MessageResults[0].ExecutionResult.Err)
 					}
 				}
 
