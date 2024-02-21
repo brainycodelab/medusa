@@ -8,14 +8,20 @@ contract TestContract {
 
     function one() public {
         assert(state);
+
+        state = false;
     }
 
     function two() public {
         assert(state);
+
+        state = false;
     }
 
     function three() public {
         assert(state);
+
+        state = false;
     }
 }
 

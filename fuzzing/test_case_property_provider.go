@@ -65,6 +65,11 @@ func attachPropertyTestCaseProvider(fuzzer *Fuzzer) *PropertyTestCaseProvider {
 // isPropertyTest check whether the method is a property test given potential naming prefixes it must conform to
 // and its underlying input/output arguments.
 func (t *PropertyTestCaseProvider) isPropertyTest(method abi.Method) bool {
+	// Don't register setup hook as a test case
+	if method.Name == "setUp" {
+		return false
+	}
+
 	// Loop through all enabled prefixes to find a match
 	for _, prefix := range t.fuzzer.Config().Fuzzing.Testing.PropertyTesting.TestPrefixes {
 		if strings.HasPrefix(method.Name, prefix) {

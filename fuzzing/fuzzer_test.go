@@ -179,8 +179,8 @@ func TestOptimizationMode(t *testing.T) {
 	}
 }
 
-// TestSetupHooks runs a test to ensure that setup hooks work as expected.
-func TestSetupHooks(t *testing.T) {
+// TestSetupHook runs a test to ensure that setup hooks work as expected.
+func TestSetupHook(t *testing.T) {
 	runFuzzerTest(t, &fuzzerSolcFileTest{
 		filePath: "testdata/contracts/assertions/assert_setup_hook.sol",
 		configUpdates: func(config *config.ProjectConfig) {
