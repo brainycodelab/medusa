@@ -187,7 +187,6 @@ func TestSetupHook(t *testing.T) {
 			config.Fuzzing.DeploymentOrder = []string{"TestContract", "TestContract2"}
 			config.Fuzzing.TestLimit = 500
 			config.Fuzzing.Testing.StopOnFailedTest = false
-			config.Fuzzing.Testing.PropertyTesting.Enabled = true
 			config.Fuzzing.Testing.AssertionTesting.Enabled = true
 		},
 		method: func(f *fuzzerTestContext) {

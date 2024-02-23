@@ -32,15 +32,15 @@ contract TestContract2 {
         num = 3;
     }
 
-    function fuzz_one() public returns (bool) {
-        return num == 3;
+    function four() public {
+        assert(num == 3);
     }
 
-    function fuzz_two() public returns (bool) {
-        return num == 3;
+    function five() public {
+        assert(num == 3);
     }
 
-    function fuzz_three() public returns (bool) {
-        return num == 3;
+    function six() public {
+        assert(num == 3);
     }
 }
