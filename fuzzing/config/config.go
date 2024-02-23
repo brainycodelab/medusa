@@ -47,6 +47,9 @@ type FuzzingConfig struct {
 	// the in-memory corpus will be used, but not flush to disk.
 	CorpusDirectory string `json:"corpusDirectory"`
 
+	// IncludeInterfacesInCorpus describes whether to include coverage information interfaces in the corpus
+	IncludeInterfacesInCorpus bool `json:"includeInterfacesInCorpus"`
+
 	// CoverageEnabled describes whether to use coverage-guided fuzzing
 	CoverageEnabled bool `json:"coverageEnabled"`
 

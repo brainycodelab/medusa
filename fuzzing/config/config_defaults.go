@@ -32,15 +32,16 @@ func GetDefaultProjectConfig(platform string) (*ProjectConfig, error) {
 	// Create a project configuration
 	projectConfig := &ProjectConfig{
 		Fuzzing: FuzzingConfig{
-			Workers:            10,
-			WorkerResetLimit:   50,
-			Timeout:            0,
-			TestLimit:          0,
-			CallSequenceLength: 100,
-			DeploymentOrder:    []string{},
-			ConstructorArgs:    map[string]map[string]any{},
-			CorpusDirectory:    "",
-			CoverageEnabled:    true,
+			Workers:                   10,
+			WorkerResetLimit:          50,
+			Timeout:                   0,
+			TestLimit:                 0,
+			CallSequenceLength:        100,
+			DeploymentOrder:           []string{},
+			ConstructorArgs:           map[string]map[string]any{},
+			CorpusDirectory:           "",
+			IncludeInterfacesInCorpus: false,
+			CoverageEnabled:           true,
 			SenderAddresses: []string{
 				"0x10000",
 				"0x20000",
