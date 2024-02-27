@@ -31,6 +31,7 @@ func (f FuzzingConfig) MarshalJSON() ([]byte, error) {
 		MaxBlockTimestampDelay  uint64                    `json:"blockTimestampDelayMax"`
 		BlockGasLimit           uint64                    `json:"blockGasLimit"`
 		TransactionGasLimit     uint64                    `json:"transactionGasLimit"`
+		MonitorGasUsage         bool                      `json:"monitorGasUsage"`
 		Testing                 TestingConfig             `json:"testing"`
 		TestChainConfig         config.TestChainConfig    `json:"chainConfig"`
 	}
@@ -56,6 +57,7 @@ func (f FuzzingConfig) MarshalJSON() ([]byte, error) {
 	enc.MaxBlockTimestampDelay = f.MaxBlockTimestampDelay
 	enc.BlockGasLimit = f.BlockGasLimit
 	enc.TransactionGasLimit = f.TransactionGasLimit
+	enc.MonitorGasUsage = f.MonitorGasUsage
 	enc.Testing = f.Testing
 	enc.TestChainConfig = f.TestChainConfig
 	return json.Marshal(&enc)
@@ -80,6 +82,7 @@ func (f *FuzzingConfig) UnmarshalJSON(input []byte) error {
 		MaxBlockTimestampDelay  *uint64                   `json:"blockTimestampDelayMax"`
 		BlockGasLimit           *uint64                   `json:"blockGasLimit"`
 		TransactionGasLimit     *uint64                   `json:"transactionGasLimit"`
+		MonitorGasUsage         *bool                     `json:"monitorGasUsage"`
 		Testing                 *TestingConfig            `json:"testing"`
 		TestChainConfig         *config.TestChainConfig   `json:"chainConfig"`
 	}
@@ -137,6 +140,9 @@ func (f *FuzzingConfig) UnmarshalJSON(input []byte) error {
 	}
 	if dec.TransactionGasLimit != nil {
 		f.TransactionGasLimit = *dec.TransactionGasLimit
+	}
+	if dec.MonitorGasUsage != nil {
+		f.MonitorGasUsage = *dec.MonitorGasUsage
 	}
 	if dec.Testing != nil {
 		f.Testing = *dec.Testing
