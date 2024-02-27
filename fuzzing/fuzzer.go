@@ -274,6 +274,8 @@ func (f *Fuzzer) ReportTestCaseFinished(testCase TestCase) {
 
 // AddCompilationTargets takes a compilation and updates the Fuzzer state with additional Fuzzer.ContractDefinitions
 // definitions and Fuzzer.BaseValueSet values.
+// AddCompilationTargets takes a compilation and updates the Fuzzer state with additional Fuzzer.ContractDefinitions
+// definitions and Fuzzer.BaseValueSet values.
 func (f *Fuzzer) AddCompilationTargets(compilations []compilationTypes.Compilation) {
 	// Loop for each contract in each compilation and deploy it to the test node.
 	for i := 0; i < len(compilations); i++ {
@@ -289,7 +291,17 @@ func (f *Fuzzer) AddCompilationTargets(compilations []compilationTypes.Compilati
 			// Loop for every contract and register it in our contract definitions
 			for contractName := range source.Contracts {
 				contract := source.Contracts[contractName]
-				contractDefinition := fuzzerTypes.NewContract(contractName, sourcePath, &contract, compilation)
+
+				// Register contract setup hook if exists
+				var setupHook *fuzzerTypes.ContractSetupHook
+				for _, method := range contract.Abi.Methods {
+					if method.Name == "setUp" {
+						setupHook = &fuzzerTypes.ContractSetupHook{Method: method, DeployerAddress: f.deployer}
+						break
+					}
+				}
+
+				contractDefinition := fuzzerTypes.NewContract(contractName, sourcePath, &contract, compilation, setupHook)
 				f.contractDefinitions = append(f.contractDefinitions, contractDefinition)
 			}
 		}
