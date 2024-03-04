@@ -2,15 +2,16 @@ package fuzzing
 
 import (
 	"encoding/hex"
+	"math/big"
+	"math/rand"
+	"testing"
+
 	"github.com/crytic/medusa/chain"
 	"github.com/crytic/medusa/events"
 	"github.com/crytic/medusa/fuzzing/calls"
 	"github.com/crytic/medusa/fuzzing/valuegeneration"
 	"github.com/crytic/medusa/utils"
 	"github.com/ethereum/go-ethereum/common"
-	"math/big"
-	"math/rand"
-	"testing"
 
 	"github.com/crytic/medusa/fuzzing/config"
 	"github.com/stretchr/testify/assert"
@@ -204,6 +205,7 @@ func TestChainBehaviour(t *testing.T) {
 // TestCheatCodes runs tests to ensure that vm extensions ("cheat codes") are working as intended.
 func TestCheatCodes(t *testing.T) {
 	filePaths := []string{
+		"testdata/contracts/cheat_codes/vm/expect_call.sol",
 		"testdata/contracts/cheat_codes/utils/addr.sol",
 		"testdata/contracts/cheat_codes/utils/to_string.sol",
 		"testdata/contracts/cheat_codes/utils/sign.sol",
