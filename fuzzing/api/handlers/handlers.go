@@ -100,9 +100,14 @@ func GetLogsHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 
 func GetCoverageInfoHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if fuzzer.Corpus() == nil {
+			json.NewEncoder(w).Encode(map[string]any{"error": "Corpus not yet initialized"})
+			return
+		}
+
 		sourceAnalysis, err := coverage.AnalyzeSourceCoverage(fuzzer.Compilations(), fuzzer.Corpus().CoverageMaps())
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{"error": "Corpus not yet initialized"})
 			return
 		}
 
@@ -173,9 +178,14 @@ func WebsocketHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 					err = conn.WriteJSON(map[string]string{"logs": logs.String()})
 					break
 				case "coverage":
+					if fuzzer.Corpus() == nil {
+						err = conn.WriteJSON(map[string]string{"error": "Corpus not yet initialized"})
+						break
+					}
+
 					sourceAnalysis, err := coverage.AnalyzeSourceCoverage(fuzzer.Compilations(), fuzzer.Corpus().CoverageMaps())
 					if err != nil {
-						err = conn.WriteMessage(websocket.TextMessage, []byte("Error analyzing source coverage"))
+						err = conn.WriteJSON(map[string]string{"error": "Error analyzing source coverage"})
 					}
 
 					err = conn.WriteJSON(map[string]any{"coverage": sourceAnalysis})
@@ -192,7 +202,7 @@ func WebsocketHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 func WebsocketGetEnvHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handleWebSocket(w, r, func(conn *websocket.Conn) {
-			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval) * time.Second
+			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval*1000) * time.Millisecond
 
 			ticker := time.NewTicker(wsUpdateInterval)
 			defer ticker.Stop()
@@ -228,7 +238,7 @@ func WebsocketGetEnvHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 func WebsocketGetFuzzingInfoHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handleWebSocket(w, r, func(conn *websocket.Conn) {
-			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval) * time.Second
+			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval*1000) * time.Millisecond
 
 			ticker := time.NewTicker(wsUpdateInterval)
 			defer ticker.Stop()
@@ -263,7 +273,7 @@ func WebsocketGetLogsHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		handleWebSocket(w, r, func(conn *websocket.Conn) {
-			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval) * time.Second
+			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval*1000) * time.Millisecond
 
 			ticker := time.NewTicker(wsUpdateInterval)
 			defer ticker.Stop()
@@ -289,7 +299,7 @@ func WebsocketGetLogsHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 func WebsocketGetCoverageInfoHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handleWebSocket(w, r, func(conn *websocket.Conn) {
-			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval) * time.Second
+			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval*1000) * time.Millisecond
 
 			ticker := time.NewTicker(wsUpdateInterval)
 			defer ticker.Stop()
@@ -319,7 +329,7 @@ func WebsocketGetCoverageInfoHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 func WebsocketGetCorpusHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handleWebSocket(w, r, func(conn *websocket.Conn) {
-			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval) * time.Second
+			wsUpdateInterval := time.Duration(fuzzer.Config().ApiConfig.WsUpdateInterval*1000) * time.Millisecond
 
 			ticker := time.NewTicker(wsUpdateInterval)
 			defer ticker.Stop()

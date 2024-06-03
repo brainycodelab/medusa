@@ -244,7 +244,7 @@ type ApiConfig struct {
 	Port int `json:"port"`
 
 	// WsUpdateInterval describes the interval that the API will send updates via the websocket connection
-	WsUpdateInterval int `json:"wsUpdateInterval"`
+	WsUpdateInterval float32 `json:"wsUpdateInterval"`
 }
 
 // ReadProjectConfigFromFile reads a JSON-serialized ProjectConfig from a provided file path.
