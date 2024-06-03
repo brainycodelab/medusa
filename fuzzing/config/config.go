@@ -27,6 +27,9 @@ type ProjectConfig struct {
 
 	// Logging describes the configuration used for logging to file and console
 	Logging LoggingConfig `json:"logging"`
+
+	// ApiConfig describes the configuration options for the API
+	ApiConfig ApiConfig `json:"apiConfig"`
 }
 
 // FuzzingConfig describes the configuration options used by the fuzzing.Fuzzer.
@@ -230,6 +233,18 @@ type FileLoggingConfig struct {
 	// LogDirectory describes what directory log files should be outputted in. LogDirectory being a non-empty string
 	// is equivalent to enabling file logging.
 	LogDirectory bool `json:"logDirectory"`
+}
+
+// ApiConfig describes the configuration options for the API
+type ApiConfig struct {
+	// Enabled describes whether the API should be run
+	Enabled bool `json:"enabled"`
+
+	// Port describes the port that the API will be running on
+	Port int `json:"port"`
+
+	// WsUpdateInterval describes the interval that the API will send updates via the websocket connection
+	WsUpdateInterval int `json:"wsUpdateInterval"`
 }
 
 // ReadProjectConfigFromFile reads a JSON-serialized ProjectConfig from a provided file path.

@@ -200,9 +200,34 @@ func (f *Fuzzer) ContractDefinitions() fuzzerTypes.Contracts {
 	return slices.Clone(f.contractDefinitions)
 }
 
+// Metrics exposes the underlying metrics provided to the Fuzzer.
+func (f *Fuzzer) Metrics() *FuzzerMetrics {
+	return f.metrics
+}
+
+// Logger exposes the logger registered with the Fuzzer.
+func (f *Fuzzer) Logger() *logging.Logger {
+	return f.logger
+}
+
+// Context exposes the Fuzzer's running context.
+func (f *Fuzzer) Context() context.Context {
+	return f.ctx
+}
+
 // Config exposes the underlying project configuration provided to the Fuzzer.
 func (f *Fuzzer) Config() config.ProjectConfig {
 	return f.config
+}
+
+// Corpus exposes the underlying corpus provided to the Fuzzer.
+func (f *Fuzzer) Corpus() *corpus.Corpus {
+	return f.corpus
+}
+
+// Compilations exposes the Fuzzer compilation targets.
+func (f *Fuzzer) Compilations() []compilationTypes.Compilation {
+	return f.compilations
 }
 
 // BaseValueSet exposes the underlying value set provided to the Fuzzer value generators to aid in generation

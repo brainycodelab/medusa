@@ -82,6 +82,11 @@ func GetDefaultProjectConfig(platform string) (*ProjectConfig, error) {
 			},
 			TestChainConfig: *chainConfig,
 		},
+		ApiConfig: ApiConfig{
+			Enabled:          false,
+			Port:             8080,
+			WsUpdateInterval: 5,
+		},
 		Compilation: compilationConfig,
 		Logging: LoggingConfig{
 			Level:        zerolog.InfoLevel,

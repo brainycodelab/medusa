@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/crytic/medusa/cmd/exitcodes"
+	"github.com/crytic/medusa/fuzzing/api"
 	"github.com/crytic/medusa/logging/colors"
 	"os"
 	"os/signal"
@@ -148,6 +149,11 @@ func cmdRunFuzz(cmd *cobra.Command, args []string) error {
 	fuzzer, fuzzErr := fuzzing.NewFuzzer(*projectConfig)
 	if fuzzErr != nil {
 		return exitcodes.NewErrorWithExitCode(fuzzErr, exitcodes.ExitCodeHandledError)
+	}
+
+	// Start the server
+	if projectConfig.ApiConfig.Enabled {
+		go api.Start(fuzzer)
 	}
 
 	// Stop our fuzzing on keyboard interrupts
