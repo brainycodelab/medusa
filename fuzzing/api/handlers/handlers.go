@@ -106,7 +106,7 @@ func GetCoverageInfoHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 			return
 		}
 
-		err = json.NewEncoder(w).Encode(map[string]any{"sourceAnalysis": sourceAnalysis})
+		err = json.NewEncoder(w).Encode(map[string]any{"coverage": sourceAnalysis})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -178,7 +178,7 @@ func WebsocketHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 						err = conn.WriteMessage(websocket.TextMessage, []byte("Error analyzing source coverage"))
 					}
 
-					err = conn.WriteJSON(map[string]any{"sourceAnalysis": sourceAnalysis})
+					err = conn.WriteJSON(map[string]any{"coverage": sourceAnalysis})
 					break
 				case "corpus":
 					err = conn.WriteJSON(map[string]any{"unexecutedCallSequences": fuzzer.Corpus().UnexecutedCallSequences()})
@@ -304,7 +304,7 @@ func WebsocketGetCoverageInfoHandler(fuzzer *fuzzing.Fuzzer) http.HandlerFunc {
 				if err != nil {
 					conn.WriteJSON(map[string]string{"error": "Error analyzing source coverage"})
 				}
-				err = conn.WriteJSON(map[string]any{"sourceAnalysis": sourceAnalysis})
+				err = conn.WriteJSON(map[string]any{"coverage": sourceAnalysis})
 				if err != nil {
 					log.Println(err)
 					break

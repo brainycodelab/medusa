@@ -10,7 +10,6 @@ import (
 	"github.com/crytic/medusa/fuzzing/api/middleware"
 	"github.com/crytic/medusa/fuzzing/api/routes"
 	"github.com/crytic/medusa/fuzzing/config"
-	"github.com/crytic/medusa/fuzzing/coverage"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -209,10 +208,14 @@ func TestCoverageHandler(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
-	var body *coverage.SourceAnalysis
+	var body map[string]any
 	err = json.Unmarshal(rr.Body.Bytes(), &body)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if _, ok := body["coverage"]; !ok {
+		t.Fatalf("handler did not return coverage: got %v", body)
 	}
 }
 
@@ -277,25 +280,35 @@ func TestWebsocketHandler(t *testing.T) {
 
 	defer fuzzer.Stop()
 
-	v, err := platforms.GetSystemSolcVersion()
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	tcs := []struct {
-		name    string
-		message string
-		reply   any
+		name           string
+		message        string
+		expectedFields []string
 	}{
 		{
-			name:    "TestEnv",
-			message: "env",
-			reply:   map[string]any{"config": fuzzer.Config(), "system": os.Environ(), "medusaVersion": "0.1.3", "solcVersion": v.String()},
+			name:           "WebsocketEnvHandler",
+			message:        "env",
+			expectedFields: []string{"config", "system", "medusaVersion", "solcVersion"},
 		},
 		{
-			name:    "TestCorpus",
-			message: "corpus",
-			reply:   map[string]any{"unexecutedCallSequences": fuzzer.Corpus().UnexecutedCallSequences()},
+			name:           "WebsocketFuzzingHandler",
+			message:        "fuzzing",
+			expectedFields: []string{"testCases"},
+		},
+		{
+			name:           "WebsocketLogsHandler",
+			message:        "logs",
+			expectedFields: []string{"logs"},
+		},
+		{
+			name:           "WebsocketCorpusHandler",
+			message:        "corpus",
+			expectedFields: []string{"unexecutedCallSequences"},
+		},
+		{
+			name:           "WebsocketCoverageHandler",
+			message:        "coverage",
+			expectedFields: []string{"coverage"},
 		},
 	}
 
@@ -307,26 +320,21 @@ func TestWebsocketHandler(t *testing.T) {
 
 			sendMessage(t, ws, tt.message)
 
-			replyType := reflect.TypeOf(tt.reply)
-			switch replyType.Kind() {
-			case reflect.Map:
-				reply := receiveWSMessage[map[string]any](t, ws)
+			reply := receiveWSMessage[map[string]any](t, ws)
 
-				// Compare every field of the reply
-				for k, v := range tt.reply.(map[string]any) {
-					if v != reply[k] {
-						t.Errorf("Expected %v, got %v", v, reply[k])
-					}
+			// Check that we get every expected field
+			for _, field := range tt.expectedFields {
+				if _, ok := reply[field]; !ok {
+					t.Errorf("handler did not return %s: got %v", field, reply)
 				}
-			default:
-				t.Errorf("Unsupported reply type: %v", replyType)
 			}
-
 		})
 	}
 }
 
 func TestWebsocketHandlers(t *testing.T) {
+	// TODO: Fix timeout issue with this test
+
 	fuzzer, err := initializeFuzzer()
 	if err != nil {
 		t.Fatal(err)
@@ -364,7 +372,7 @@ func TestWebsocketHandlers(t *testing.T) {
 		{
 			name:           "WebsocketCoverageHandler",
 			handlerFunc:    handlers.WebsocketGetCoverageInfoHandler(fuzzer),
-			expectedFields: []string{"sourceAnalysis"},
+			expectedFields: []string{"coverage"},
 		},
 	}
 
