@@ -34,13 +34,19 @@ contract TestContract2 {
 
     function four() public {
         assert(num == 3);
+
+        num = 0;
     }
 
     function five() public {
         assert(num == 3);
+
+        num = 0;
     }
 
     function six() public {
         assert(num == 3);
+
+        num = 0;
     }
 }
