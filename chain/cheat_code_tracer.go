@@ -3,8 +3,6 @@ package chain
 import (
 	"math/big"
 
-	"math/big"
-
 	"github.com/crytic/medusa/chain/types"
 	"github.com/crytic/medusa/compilation/abiutils"
 	"github.com/ethereum/go-ethereum/accounts/abi"

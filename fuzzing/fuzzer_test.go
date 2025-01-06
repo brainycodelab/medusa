@@ -4,10 +4,6 @@ import (
 	"encoding/hex"
 	"math/big"
 	"math/rand"
-	"testing"
-
-	"math/big"
-	"math/rand"
 	"reflect"
 	"testing"
 

@@ -6,9 +6,6 @@ import (
 	"math/big"
 	"sort"
 
-	"math/big"
-	"sort"
-
 	"github.com/crytic/medusa/chain/config"
 	"github.com/crytic/medusa/compilation/abiutils"
 	"github.com/ethereum/go-ethereum/core/rawdb"
