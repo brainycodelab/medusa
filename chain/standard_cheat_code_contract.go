@@ -1,15 +1,17 @@
 package chain
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
-	"github.com/crytic/medusa/compilation/abiutils"
-	"github.com/crytic/medusa/logging"
+	"github.com/ethereum/go-ethereum/core/types"
 	"math/big"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/crytic/medusa/logging"
 
 	"github.com/crytic/medusa/utils"
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -531,7 +533,7 @@ func getStandardCheatCodeContract(tracer *cheatCodeTracer) (*CheatCodeContract, 
 	contract.addMethod(
 		"expectEmit", abi.Arguments{}, abi.Arguments{},
 		func(tracer *cheatCodeTracer, inputs []any) ([]any, *cheatCodeRawReturnData) {
-			return expectEmitHandler(tracer, true, true, true, true, nil)
+			return expectEmitHandler(tracer, true, true, true, true, common.Address{})
 		},
 	)
 
@@ -540,16 +542,16 @@ func getStandardCheatCodeContract(tracer *cheatCodeTracer) (*CheatCodeContract, 
 		"expectEmit", abi.Arguments{
 			{Type: typeBool}, // checkTopic1
 			{Type: typeBool}, // checkTopic2
-			{Type: typeBool}, // checkTopic3  
+			{Type: typeBool}, // checkTopic3
 			{Type: typeBool}, // checkData
 		}, abi.Arguments{},
 		func(tracer *cheatCodeTracer, inputs []any) ([]any, *cheatCodeRawReturnData) {
 			return expectEmitHandler(tracer,
 				inputs[0].(bool), // checkTopic1
-				inputs[1].(bool), // checkTopic2 
+				inputs[1].(bool), // checkTopic2
 				inputs[2].(bool), // checkTopic3
 				inputs[3].(bool), // checkData
-				nil,             // emitter
+				common.Address{}, // emitter
 			)
 		},
 	)
@@ -573,10 +575,10 @@ func getStandardCheatCodeContract(tracer *cheatCodeTracer) (*CheatCodeContract, 
 		}, abi.Arguments{},
 		func(tracer *cheatCodeTracer, inputs []any) ([]any, *cheatCodeRawReturnData) {
 			return expectEmitHandler(tracer,
-				inputs[0].(bool), // checkTopic1
-				inputs[1].(bool), // checkTopic2
-				inputs[2].(bool), // checkTopic3
-				inputs[3].(bool), // checkData
+				inputs[0].(bool),           // checkTopic1
+				inputs[1].(bool),           // checkTopic2
+				inputs[2].(bool),           // checkTopic3
+				inputs[3].(bool),           // checkData
 				inputs[4].(common.Address), // emitter
 			)
 		},
@@ -590,7 +592,7 @@ func getStandardCheatCodeContract(tracer *cheatCodeTracer) (*CheatCodeContract, 
 func expectEmitHandler(tracer *cheatCodeTracer, checkTopic1, checkTopic2, checkTopic3, checkData bool, emitter common.Address) ([]any, *cheatCodeRawReturnData) {
 	// Get the caller frame
 	cheatCodeCallerFrame := tracer.PreviousCallFrame()
-	
+
 	// Initialize sub logger
 	logger := logging.GlobalLogger.NewSubLogger("module", "cheatcodes")
 
@@ -601,7 +603,7 @@ func expectEmitHandler(tracer *cheatCodeTracer, checkTopic1, checkTopic2, checkT
 	// We need to grab the expected log from the next event emitted after this cheat call
 	var expectedLog *types.Log
 
-	// Attach hook for the next log emission 
+	// Attach hook for the next log emission
 	var expectEmitHook func()
 	expectEmitHook = func() {
 		currentFrame := tracer.CurrentCallFrame()
@@ -630,7 +632,7 @@ func expectEmitHandler(tracer *cheatCodeTracer, checkTopic1, checkTopic2, checkT
 				}
 
 				// For subsequent logs, verify they match what we expect
-				if emitter != common.Address{} && lastLog.Address != emitter {
+				if emitter != (common.Address{}) && lastLog.Address != emitter {
 					return // Skip logs from other emitters
 				}
 
@@ -644,7 +646,7 @@ func expectEmitHandler(tracer *cheatCodeTracer, checkTopic1, checkTopic2, checkT
 							matched = matched && (lastLog.Topics[1] == expectedLog.Topics[1])
 						}
 						if checkTopic2 && len(lastLog.Topics) > 2 && len(expectedLog.Topics) > 2 {
-							matched = matched && (lastLog.Topics[2] == expectedLog.Topics[2]) 
+							matched = matched && (lastLog.Topics[2] == expectedLog.Topics[2])
 						}
 						if checkTopic3 && len(lastLog.Topics) > 3 && len(expectedLog.Topics) > 3 {
 							matched = matched && (lastLog.Topics[3] == expectedLog.Topics[3])
