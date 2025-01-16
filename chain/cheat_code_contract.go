@@ -198,3 +198,50 @@ func (c *CheatCodeContract) Run(input []byte) ([]byte, error) {
 	// Return our packed values
 	return packedOutput, nil
 }
+
+// setStorage stores a map of values associated with a key in the contract's storage
+func (c *CheatCodeContract) setStorage(key string, value map[string]any) {
+	_, ok := c.storage[key]
+	// Initialize storage for key if not already initialized
+	if !ok {
+		c.storage[key] = make(map[string]any)
+	}
+
+	c.storage[key] = value
+}
+
+// setNestedStorage sets a value in a nested map structure within the contract's storage
+// using both a primary key and a nested key
+func (c *CheatCodeContract) setNestedStorage(key string, nestedKey string, value any) {
+	_, ok := c.storage[key]
+	// Initialize storage for key if not already initialized
+	if !ok {
+		c.storage[key] = make(map[string]any)
+	}
+
+	c.storage[key][nestedKey] = value
+}
+
+// getStorage retrieves the entire map of values associated with a key from the contract's storage
+func (c *CheatCodeContract) getStorage(key string) (map[string]any, bool) {
+	item, ok := c.storage[key]
+	return item, ok
+}
+
+// getNestedStorage retrieves a specific value from a nested map structure within the contract's storage
+// using both a primary key and a nested key
+func (c *CheatCodeContract) getNestedStorage(key string, nestedKey string) (any, bool) {
+	item, ok := c.storage[key][nestedKey]
+	return item, ok
+}
+
+// deleteStorage removes an entire map of values associated with a key from the contract's storage
+func (c *CheatCodeContract) deleteStorage(key string) {
+	delete(c.storage, key)
+}
+
+// deleteNestedStorage removes a specific value from a nested map structure within the contract's storage
+// using both a primary key and a nested key
+func (c *CheatCodeContract) deleteNestedStorage(key string, nestedKey string) {
+	delete(c.storage[key], nestedKey)
+}

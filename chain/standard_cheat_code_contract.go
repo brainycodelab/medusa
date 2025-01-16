@@ -269,15 +269,9 @@ func getStandardCheatCodeContract(tracer *cheatCodeTracer) (*CheatCodeContract, 
 			// Obtain the caller frame.
 			cheatCodeCallerFrame := tracer.PreviousCallFrame()
 
-			// Initialize storage for startPrank
-			_, ok := contract.storage["startPrank"]
-			if !ok {
-				contract.storage["startPrank"] = map[string]any{}
-			}
-
 			// Store new caller address
 			newCallerAddress := inputs[0].(common.Address)
-			contract.storage["startPrank"]["newCallerAddress"] = newCallerAddress
+			contract.setNestedStorage("startPrank", "newCallerAddress", newCallerAddress)
 
 			var nextFrameEnterHook types.GenericHookFunc
 			nextFrameEnterHook = func() {
@@ -286,7 +280,7 @@ func getStandardCheatCodeContract(tracer *cheatCodeTracer) (*CheatCodeContract, 
 
 				// If we don't have a caller address, stopPrank was called and we can stop propagating the hook
 				// If the caller address has changed, there has been a new call to startPrank and we can stop propagating the hook
-				if callerAddress, ok := contract.storage["startPrank"]["newCallerAddress"]; ok && callerAddress == newCallerAddress {
+				if callerAddress, ok := contract.getNestedStorage("startPrank", "newCallerAddress"); ok && callerAddress == newCallerAddress {
 					// Override the caller address for the current scope
 					scopeContext.Contract.CallerAddress = newCallerAddress
 
@@ -309,7 +303,7 @@ func getStandardCheatCodeContract(tracer *cheatCodeTracer) (*CheatCodeContract, 
 		"stopPrank", abi.Arguments{}, abi.Arguments{},
 		func(tracer *cheatCodeTracer, inputs []any) ([]any, *cheatCodeRawReturnData) {
 			// Delete new caller address
-			delete(contract.storage["startPrank"], "newCallerAddress")
+			contract.deleteNestedStorage("startPrank", "newCallerAddress")
 
 			return nil, nil
 		},
